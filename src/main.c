@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  ******************************************************************************
  * File Name          : main.c
  * Description        : Main program body
@@ -31,6 +31,9 @@
  ******************************************************************************
  */
 /* Includes ------------------------------------------------------------------*/
+
+
+//testtesttest
 #include "math.h"
 #include "stm32f7xx_hal.h"
 #include "cmsis_os.h"
@@ -216,25 +219,26 @@ void vUserTask(void const * argument)
 	/*
 	 * ADC
 	 * - pusAdcValue[3]
-	 * - ÇÊÅÍ ³ª ¿¬»êÃ³¸®¸¦ Ãß°¡ ÇÏ°í ½ÍÀ¸¸é, main.h ÀÇ _UseAdcAcqTask ¸¦ '1' ·Î ¼öÁ¤ÇÏ°í,
-	 * vAdcAcqTask ÇÔ¼ö ³»¿¡¼­ Ãß°¡ ÇÏ¸é µÊ.
+	 * - í•„í„° ë‚˜ ì—°ì‚°ì²˜ë¦¬ë¥¼ ì¶”ê°€ í•˜ê³  ì‹¶ìœ¼ë©´, main.h ì˜ _UseAdcAcqTask ë¥¼ '1' ë¡œ ìˆ˜ì •í•˜ê³ ,
+	 * vAdcAcqTask í•¨ìˆ˜ ë‚´ì—ì„œ ì¶”ê°€ í•˜ë©´ ë¨.
 	 *
 	 * DAC
 	 * - vDacValueSet(uint8_t ucCh, uint16_t usValue)  MAX 0xFFF(4095)
 	 *
 	 * Absolute Angle Encoder
 	 * - pusAbsoluteEncoder[2] : Update in 1msec
-	 * - Update ÁÖ±â ¹Ù²Ù°í ½ÍÀ¸¸é, digital.c -> vEncoderAcqTask -> "osDelay(1)" ¼öÁ¤ (1msec ´ÜÀ§)
+	 * - Update ì£¼ê¸° ë°”ê¾¸ê³  ì‹¶ìœ¼ë©´, digital.c -> vEncoderAcqTask -> "osDelay(1)" ìˆ˜ì • (1msec ë‹¨ìœ„)
 	 *
 	 * Wheel Encoder (Max 10KHz)
 	 * - pfEncoderFreq[4]
 	 *
 	 * Digital Out
-	 * - digital.h ÂüÁ¶
+	 * - digital.h ì°¸ì¡°
 	 *
 	 * Digital In
-	 * - digital.h ÂüÁ¶
+	 * - digital.h ì°¸ì¡°
 	 */
+	//shjung test
 
 	uint16_t usDacTestValue = 0;
 	uint8_t ucTemp = 0;
