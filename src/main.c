@@ -269,7 +269,7 @@ void vUserTask(void const * argument)
 
 
 
-	float ucDriveMax=10;				//	Drive Motor Command Limit
+	float ucDriveMax=4000;				//	Drive Motor Command Limit
 	float ucSteerMax=5;					//	Steering Motor Command Limit
 
 
@@ -296,7 +296,7 @@ void vUserTask(void const * argument)
 	ucDrive_D=0;
 	ucDrive_I=0;
 
-	ucPedalGain=0.001;
+	ucPedalGain=4000;
 
 	ctrlSAS=0;
 	ctrlSWA=0;
@@ -315,6 +315,12 @@ void vUserTask(void const * argument)
 		//	Switch Configuration
 
 		usIGN=_IsKeyIn();
+
+		if(usIGN==0)
+		{
+			delay(500);
+			continue;
+		}
 
 		if(_IsSpareDIn0()!=_IsSpareDIn1())
 		{
@@ -479,11 +485,11 @@ void vUserTask(void const * argument)
 
 		//	Control Command Output
 
-		if(ctrlDir_L=1)
+		if(ctrlDir_L==1)
 		{
 			_DriveMotor0Ctrl(1);
 		}
-		if(ctrlDir_L=1)
+		if(ctrlDir_L==1)
 		{
 			_DriveMotor0Ctrl(0);
 		}
@@ -492,11 +498,11 @@ void vUserTask(void const * argument)
 			_DriveMotor0Stop();
 		}
 
-		if(ctrlDir_R=1)
+		if(ctrlDir_R==1)
 		{
 			_DriveMotor1Ctrl(1);
 		}
-		if(ctrlDir_R=-1)
+		if(ctrlDir_R==-1)
 		{
 			_DriveMotor1Ctrl(0);
 		}
@@ -504,6 +510,21 @@ void vUserTask(void const * argument)
 		{
 			_DriveMotor1Stop();
 		}
+
+		if(ctrlDrive_L>ucDriveMax)
+		{
+			ctrlDrive_L=ucDriveMax;
+			ctrlDrive_R=ctrlDrive_R*(ucDriveMax/ctrlDrive_L);
+		}
+		if(ctrlDrive_R>ucDriveMax)
+		{
+			ctrlDrive_R=ucDriveMax;
+			ctrlDrive_L=ctrlDrive_L*(ucDriveMax/ctrlDrive_R);
+		}
+
+		vDacValueSet(0,ctrlDrive_L);
+		vDacValueSet(1,ctrlDrive_R);
+
 
 
 
