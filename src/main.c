@@ -347,9 +347,9 @@ void vUserTask(void const * argument)
 
 		//	Rear Wheel Steering
 
-		float ctrlerr;
-		ctrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
-		ctrlSAS=ucSteer_P*ctrlerr;								// Steering motor control input_PID control
+
+		ucCtrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
+		ctrlSAS=ucSteer_P*ucCtrlerr;								// Steering motor control input_PID control
 
 
 
@@ -359,7 +359,7 @@ void vUserTask(void const * argument)
 		}
 
 
-		if(ctrlerr>0)											//Motor control direction setup
+		if(ucCtrlerr>0)											//Motor control direction setup
 		{
 														//GPIO_DIR pin=1
 		}
