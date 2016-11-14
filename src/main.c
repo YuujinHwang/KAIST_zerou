@@ -32,8 +32,6 @@
  */
 /* Includes ------------------------------------------------------------------*/
 
-//yoonjinh
-//testtesttest
 #include "math.h"
 #include "stm32f7xx_hal.h"
 #include "cmsis_os.h"
@@ -267,11 +265,16 @@ void vUserTask(void const * argument)
 	float ucDrive_I;
 	float ucPedalGain;
 	float ucThrottle;					//	Throttle Pedal Gain
+	float ucCtrlerr;					// 	global variable for errors
+
+
 
 	float ucDriveMax=10;				//	Drive Motor Command Limit
+	float ucSteerMax=5;					//	Steering Motor Command Limit
 
-	float ctrlSAS;
-	float ctrlSWA;
+
+	float ctrlSAS;						// Control input for steering angle motor(SAS)
+	float ctrlSWA;						// Control input for reaction torque(SWA)
 	float ctrlDrive_L;
 	float ctrlDrive_R;
 	int ctrlDir_L;
@@ -328,15 +331,54 @@ void vUserTask(void const * argument)
 		{
 			usSPOS=0;
 		}
-
-		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;
-		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;
+																// -180 to 180
+		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;				// Steering Wheel angle
+		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
 
 		usTPSraw=pusAdcValue[0];
 		ucTPS=(usTPSraw-ucTPSoff)/(ucTPSmax-ucTPSoff);
 		ucThrottle=ucPedalGain*ucTPS;
 
 		//	Rear Wheel Steering
+
+		float ctrlerr;
+		ctrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
+		ctrlSAS=ucSteer_P*ctrlerr;								// Steering motor control input_PID control
+
+
+
+		if(_isKeyIn()==1)										// if KEY is ON, start motor
+		{
+														// RUN, START PIN - LOW (Originally open state)
+		}
+
+
+		if(ctrlerr>0)											//Motor control direction setup
+		{
+														//GPIO_DIR pin=1
+		}
+		else
+		{
+														//GPIO_DIR pin=0
+		}
+
+
+		if(ctrlSAS>10000)										// Control input saturation, max=10000
+		{
+			ctrlSAS=10000;
+		}
+		else
+		{
+			if(ctrlSAS<-10000)
+			{
+				ctrlSAS=-10000;
+			}
+		}
+
+
+		ctrlSAS=ctrlSAS/10000*5;								// Control input 0~10000  to 0V~5V mapping
+
+
 
 		//	Reaction Motor Control
 
