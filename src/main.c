@@ -316,11 +316,12 @@ void vUserTask(void const * argument)
 
 		usIGN=_IsKeyIn();
 
-		if(usIGN==0)
+		/*if(usIGN==0)
 		{
-			delay(500);
+			printf("Please Turn on the Key\n");
+			osDelay(500);
 			continue;
-		}
+		}*/
 
 		if(_IsSpareDIn0()!=_IsSpareDIn1())
 		{
@@ -342,7 +343,7 @@ void vUserTask(void const * argument)
 		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
 
 		usTPSraw=pusAdcValue[0];
-		ucTPS=(usTPSraw-ucTPSoff)/(ucTPSmax-ucTPSoff);
+		ucTPS=((double)usTPSraw-(double)ucTPSoff)/((double)ucTPSmax-(double)ucTPSoff);
 		ucThrottle=ucPedalGain*ucTPS;
 
 		//	Rear Wheel Steering
@@ -540,7 +541,7 @@ void vUserTask(void const * argument)
 		printf("Wheel - %f %f %f %f\n", pfEncoderFreq[0], pfEncoderFreq[1], pfEncoderFreq[2], pfEncoderFreq[3]);
 
 		//	DAC Example
-		if(4000 > usDacTestValue)
+		/*if(4000 > usDacTestValue)
 		{
 			usDacTestValue += 100;
 			vDacValueSet(0, usDacTestValue);
@@ -559,28 +560,34 @@ void vUserTask(void const * argument)
 			vDacValueSet(3, usDacTestValue);
 			vDacValueSet(4, usDacTestValue);
 			vDacValueSet(5, usDacTestValue);
-		}
-		printf("DAC Value - %d\n", usDacTestValue);
+		}*/
+		printf("Throttle %% : %0.4f\n", ucTPS);
+		printf("Throttle raw: %d\n", usTPSraw);
+		printf("Left Throttle : %0.4f\n", ctrlDrive_L);
+		printf("Right Throttle : %0.4f", ctrlDrive_R);
+		printf("Gear Pos : %d\n", usSPOS);
+		printf("Left Wheel Dir : %d\n", ctrlDir_L);
+		printf("Right Wheel Dir : %d\n", ctrlDir_R);
 
 		//	Digital Output Example
-		_SteerMotor0Run(ucTemp);
-		_SteerMotor0Dir(ucTemp);
-		_SteerMotor0Start(ucTemp);
+		//_SteerMotor0Run(ucTemp);
+		//_SteerMotor0Dir(ucTemp);
+		//_SteerMotor0Start(ucTemp);
 
-		_SteerMotor1Run(ucTemp);
-		_SteerMotor1Dir(ucTemp);
-		_SteerMotor1Start(ucTemp);
+		//_SteerMotor1Run(ucTemp);
+		//_SteerMotor1Dir(ucTemp);
+		//_SteerMotor1Start(ucTemp);
 
-		_DriveMotor0Ctrl(ucTemp);
-		_DriveMotor1Ctrl(ucTemp);
+		//_DriveMotor0Ctrl(ucTemp);
+		//_DriveMotor1Ctrl(ucTemp);
 
-		_RelayCtrl(ucTemp);
-		_SpareDoutCtrl(ucTemp);
+		//_RelayCtrl(ucTemp);
+		//_SpareDoutCtrl(ucTemp);
 
-		_DriveMotor0Stop();
-		_DriveMotor1Stop();
+		//_DriveMotor0Stop();
+		//_DriveMotor1Stop();
 
-		ucTemp = ~ucTemp;
+		//ucTemp = ~ucTemp;
 
 		//	Digital Input Example
 		printf("Key In - %d\n", _IsKeyIn());

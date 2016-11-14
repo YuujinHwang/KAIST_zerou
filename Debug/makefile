@@ -39,7 +39,7 @@ all: KAIST_AUTO.elf
 KAIST_AUTO.elf: $(OBJS) $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: MCU GCC Linker'
-	arm-none-eabi-gcc -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -u _printf_float -T"D:\Dropbox\work\Eclipse\KAIST_AUTO\STM32F746ZGTx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -lm -o "KAIST_AUTO.elf" @"objects.list" $(USER_OBJS) $(LIBS)
+	arm-none-eabi-gcc -mcpu=cortex-m7 -mthumb -mfloat-abi=hard -mfpu=fpv5-sp-d16 -u _printf_float -T"D:\Dropbox\work\Eclipse\SystemWorkBench\KAIST_AUTO\STM32F746ZGTx_FLASH.ld" -Wl,-Map=output.map -Wl,--gc-sections -lm -o "KAIST_AUTO.elf" @"objects.list" $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 	$(MAKE) --no-print-directory post-build
