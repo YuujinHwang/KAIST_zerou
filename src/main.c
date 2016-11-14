@@ -314,11 +314,11 @@ void vUserTask(void const * argument)
 
 		//	Switch Configuration
 
-		usIGN=_isKeyIn();
+		usIGN=_IsKeyIn();
 
-		if(_isSpareDin0()!=_isSpareDin1())
+		if(_IsSpareDIn0()!=_IsSpareDIn1())
 		{
-			if(_isSpareDin0()!=0)
+			if(_IsSpareDIn0()!=0)
 			{
 				usSPOS=1;
 			}
@@ -347,7 +347,7 @@ void vUserTask(void const * argument)
 
 
 
-		if(_isKeyIn()==1)										// if KEY is ON, start motor
+		if(_IsKeyIn()==1)										// if KEY is ON, start motor
 		{
 														// RUN, START PIN - LOW (Originally open state)
 		}
@@ -390,11 +390,11 @@ void vUserTask(void const * argument)
 		}
 		else
 		{
-			ucRadius=tan(usSAS*PI()/180-PI()/2)*ucWB;
+			ucRadius=tan(usSAS*M_PI/180-M_PI/2)*ucWB;
 		}
 
 
-		if(absol(ucRadius>ucWT/2))
+		if(fabs(ucRadius>ucWT/2))
 		{
 			ucRin=ucRadius-ucWT/2;
 			ucRout=ucRadius+ucWT/2;
