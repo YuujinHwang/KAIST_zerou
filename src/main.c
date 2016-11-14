@@ -247,29 +247,29 @@ void vUserTask(void const * argument)
 	uint usTPSraw;
 	uint usIGN;
 
-	float ucWT;
-	float ucWB;
-	float ucRadius;
-	float ucRin;
-	float ucRout;
+	uint ucWT;
+	uint ucWB;
+	double ucRadius;
+	double ucRin;
+	double ucRout;
 	uint ucTPSoff;
 	uint ucTPSmax;
 	float ucTPS;
 
 
 	float ucSteer_P;					//	Rear Steering P-gain
-	float ucSteer_D;					//	Rear Steering D-gain
-	float ucSteer_I;					//	Rear Steering I-gain
-	float ucDrive_P;
-	float ucDrive_D;
-	float ucDrive_I;
+//	float ucSteer_D;					//	Rear Steering D-gain
+//	float ucSteer_I;					//	Rear Steering I-gain
+//	float ucDrive_P;
+//	float ucDrive_D;
+//	float ucDrive_I;
 	float ucPedalGain;
 	float ucThrottle;					//	Throttle Pedal Gain
 	float ucCtrlerr;					// 	global variable for errors
 
 
 
-	float ucDriveMax=10;				//	Drive Motor Command Limit
+	float ucDriveMax=4000;				//	Drive Motor Command Limit
 	float ucSteerMax=5;					//	Steering Motor Command Limit
 
 
@@ -282,6 +282,8 @@ void vUserTask(void const * argument)
 
 	//	Initialization
 
+	usSAS=0;
+
 	ucWT=1000;
 	ucWB=1000;
 
@@ -289,14 +291,14 @@ void vUserTask(void const * argument)
 	ucTPSmax=1024;
 
 	ucSteer_P=0;
-	ucSteer_D=0;
-	ucSteer_I=0;
+//	ucSteer_D=0;
+//	ucSteer_I=0;
+//
+//	ucDrive_P=0;
+//	ucDrive_D=0;
+//	ucDrive_I=0;
 
-	ucDrive_P=0;
-	ucDrive_D=0;
-	ucDrive_I=0;
-
-	ucPedalGain=0.001;
+	ucPedalGain=4000;
 
 	ctrlSAS=0;
 	ctrlSWA=0;
@@ -314,11 +316,18 @@ void vUserTask(void const * argument)
 
 		//	Switch Configuration
 
-		usIGN=_isKeyIn();
+		usIGN=_IsKeyIn();
 
-		if(_isSpareDin0()!=_isSpareDin1())
+		/*if(usIGN==0)
 		{
-			if(_isSpareDin0()!=0)
+			printf("Please Turn on the Key\n");
+			osDelay(500);
+			continue;
+		}*/
+
+		if(_IsSpareDIn0()!=_IsSpareDIn1())
+		{
+			if(_IsSpareDIn0()!=0)
 			{
 				usSPOS=1;
 			}
@@ -332,28 +341,37 @@ void vUserTask(void const * argument)
 			usSPOS=0;
 		}
 																// -180 to 180
-		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;				// Steering Wheel angle
-		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
+		usSWA=pusAbsoluteEncoder[0]*0.3515625-180.0;				// Steering Wheel angle
+		//usSAS=pusAbsoluteEncoder[1]*0.3515625-180.0;				// Rear steering angle
 
 		usTPSraw=pusAdcValue[0];
-		ucTPS=(usTPSraw-ucTPSoff)/(ucTPSmax-ucTPSoff);
+		if(usTPSraw>ucTPSmax)
+		{
+			usTPSraw=ucTPSmax;
+		}
+		ucTPS=((float)usTPSraw-(float)ucTPSoff)/((float)ucTPSmax-(float)ucTPSoff);
+		if(ucTPS>1)
+		{
+			ucTPS=1;
+		}
+
 		ucThrottle=ucPedalGain*ucTPS;
 
 		//	Rear Wheel Steering
 
-		float ctrlerr;
-		ctrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
-		ctrlSAS=ucSteer_P*ctrlerr;								// Steering motor control input_PID control
+
+		ucCtrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
+		ctrlSAS=ucSteer_P*ucCtrlerr;								// Steering motor control input_PID control
 
 
 
-		if(_isKeyIn()==1)										// if KEY is ON, start motor
+		if(_IsKeyIn()==1)										// if KEY is ON, start motor
 		{
 														// RUN, START PIN - LOW (Originally open state)
 		}
 
 
-		if(ctrlerr>0)											//Motor control direction setup
+		if(ucCtrlerr>0)											//Motor control direction setup
 		{
 														//GPIO_DIR pin=1
 		}
@@ -386,15 +404,15 @@ void vUserTask(void const * argument)
 
 		if(usSAS==0)
 		{
-			ucRadius=1000000000;
+			ucRadius=1000000.0;
 		}
 		else
 		{
-			ucRadius=tan(usSAS*PI()/180-PI()/2)*ucWB;
+			ucRadius=tan((float)usSAS*3.14/180-3.14/2)*(float)ucWB;
 		}
 
 
-		if(absol(ucRadius>ucWT/2))
+		if(fabs(ucRadius)>ucWT/2)
 		{
 			ucRin=ucRadius-ucWT/2;
 			ucRout=ucRadius+ucWT/2;
@@ -479,11 +497,11 @@ void vUserTask(void const * argument)
 
 		//	Control Command Output
 
-		if(ctrlDir_L=1)
+		if(ctrlDir_L==1)
 		{
 			_DriveMotor0Ctrl(1);
 		}
-		if(ctrlDir_L=1)
+		if(ctrlDir_L==1)
 		{
 			_DriveMotor0Ctrl(0);
 		}
@@ -492,11 +510,11 @@ void vUserTask(void const * argument)
 			_DriveMotor0Stop();
 		}
 
-		if(ctrlDir_R=1)
+		if(ctrlDir_R==1)
 		{
 			_DriveMotor1Ctrl(1);
 		}
-		if(ctrlDir_R=-1)
+		if(ctrlDir_R==-1)
 		{
 			_DriveMotor1Ctrl(0);
 		}
@@ -504,6 +522,25 @@ void vUserTask(void const * argument)
 		{
 			_DriveMotor1Stop();
 		}
+
+		if(ctrlDrive_L>ucDriveMax)
+		{
+			ctrlDrive_L=ucDriveMax;
+			ctrlDrive_R=ctrlDrive_R*(ucDriveMax/ctrlDrive_L);
+		}
+		if(ctrlDrive_R>ucDriveMax)
+		{
+			ctrlDrive_R=ucDriveMax;
+			ctrlDrive_L=ctrlDrive_L*(ucDriveMax/ctrlDrive_R);
+		}
+		else
+		{
+
+		}
+
+		vDacValueSet(0,ctrlDrive_L);
+		vDacValueSet(1,ctrlDrive_R);
+
 
 
 
@@ -519,7 +556,7 @@ void vUserTask(void const * argument)
 		printf("Wheel - %f %f %f %f\n", pfEncoderFreq[0], pfEncoderFreq[1], pfEncoderFreq[2], pfEncoderFreq[3]);
 
 		//	DAC Example
-		if(4000 > usDacTestValue)
+		/*if(4000 > usDacTestValue)
 		{
 			usDacTestValue += 100;
 			vDacValueSet(0, usDacTestValue);
@@ -538,28 +575,38 @@ void vUserTask(void const * argument)
 			vDacValueSet(3, usDacTestValue);
 			vDacValueSet(4, usDacTestValue);
 			vDacValueSet(5, usDacTestValue);
-		}
-		printf("DAC Value - %d\n", usDacTestValue);
+		}*/
+		printf("Throttle %% : %.4f\n", ucTPS);
+		printf("Throttle raw: %d\n", usTPSraw);
+		printf("Throttle : %d\n", (int)ucThrottle);
+		printf("Left Throttle : %d\n", (int)ctrlDrive_L);
+		printf("Right Throttle : %d\n", (int)ctrlDrive_R);
+		printf("Radius: %d\n", (int)ucRadius);
+		printf("Rin: %d\n", (int)ucRin);
+		printf("Rout: %d\n", (int)ucRout);
+		printf("Gear Pos : %d\n", usSPOS);
+		printf("Left Wheel Dir : %d\n", ctrlDir_L);
+		printf("Right Wheel Dir : %d\n", ctrlDir_R);
 
 		//	Digital Output Example
-		_SteerMotor0Run(ucTemp);
-		_SteerMotor0Dir(ucTemp);
-		_SteerMotor0Start(ucTemp);
+		//_SteerMotor0Run(ucTemp);
+		//_SteerMotor0Dir(ucTemp);
+		//_SteerMotor0Start(ucTemp);
 
-		_SteerMotor1Run(ucTemp);
-		_SteerMotor1Dir(ucTemp);
-		_SteerMotor1Start(ucTemp);
+		//_SteerMotor1Run(ucTemp);
+		//_SteerMotor1Dir(ucTemp);
+		//_SteerMotor1Start(ucTemp);
 
-		_DriveMotor0Ctrl(ucTemp);
-		_DriveMotor1Ctrl(ucTemp);
+		//_DriveMotor0Ctrl(ucTemp);
+		//_DriveMotor1Ctrl(ucTemp);
 
-		_RelayCtrl(ucTemp);
-		_SpareDoutCtrl(ucTemp);
+		//_RelayCtrl(ucTemp);
+		//_SpareDoutCtrl(ucTemp);
 
-		_DriveMotor0Stop();
-		_DriveMotor1Stop();
+		//_DriveMotor0Stop();
+		//_DriveMotor1Stop();
 
-		ucTemp = ~ucTemp;
+		//ucTemp = ~ucTemp;
 
 		//	Digital Input Example
 		printf("Key In - %d\n", _IsKeyIn());
@@ -1000,7 +1047,7 @@ void StartDefaultTask(void const * argument)
 	osThreadDef(EncoderTask, vEncoderAcqTask, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE + 128);
 	osEncoderAcqTaskHandle = osThreadCreate(osThread(EncoderTask), NULL);
 
-	osThreadDef(UserTask, vUserTask, osPriorityRealtime, 0, 512);
+	osThreadDef(UserTask, vUserTask, osPriorityRealtime, 0, 3072);
 	osUserTaskHandle = osThreadCreate(osThread(UserTask), NULL);
 
 #if	(1 == _UseAdcAcqTask)
