@@ -247,22 +247,22 @@ void vUserTask(void const * argument)
 	uint usTPSraw;
 	uint usIGN;
 
-	float ucWT;
-	float ucWB;
-	float ucRadius;
-	float ucRin;
-	float ucRout;
+	uint ucWT;
+	uint ucWB;
+	double ucRadius;
+	double ucRin;
+	double ucRout;
 	uint ucTPSoff;
 	uint ucTPSmax;
 	float ucTPS;
 
 
 	float ucSteer_P;					//	Rear Steering P-gain
-	float ucSteer_D;					//	Rear Steering D-gain
-	float ucSteer_I;					//	Rear Steering I-gain
-	float ucDrive_P;
-	float ucDrive_D;
-	float ucDrive_I;
+//	float ucSteer_D;					//	Rear Steering D-gain
+//	float ucSteer_I;					//	Rear Steering I-gain
+//	float ucDrive_P;
+//	float ucDrive_D;
+//	float ucDrive_I;
 	float ucPedalGain;
 	float ucThrottle;					//	Throttle Pedal Gain
 	float ucCtrlerr;					// 	global variable for errors
@@ -282,6 +282,8 @@ void vUserTask(void const * argument)
 
 	//	Initialization
 
+	usSAS=0;
+
 	ucWT=1000;
 	ucWB=1000;
 
@@ -289,12 +291,12 @@ void vUserTask(void const * argument)
 	ucTPSmax=1024;
 
 	ucSteer_P=0;
-	ucSteer_D=0;
-	ucSteer_I=0;
-
-	ucDrive_P=0;
-	ucDrive_D=0;
-	ucDrive_I=0;
+//	ucSteer_D=0;
+//	ucSteer_I=0;
+//
+//	ucDrive_P=0;
+//	ucDrive_D=0;
+//	ucDrive_I=0;
 
 	ucPedalGain=4000;
 
@@ -339,11 +341,20 @@ void vUserTask(void const * argument)
 			usSPOS=0;
 		}
 																// -180 to 180
-		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;				// Steering Wheel angle
-		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
+		usSWA=pusAbsoluteEncoder[0]*0.3515625-180.0;				// Steering Wheel angle
+		//usSAS=pusAbsoluteEncoder[1]*0.3515625-180.0;				// Rear steering angle
 
 		usTPSraw=pusAdcValue[0];
-		ucTPS=((double)usTPSraw-(double)ucTPSoff)/((double)ucTPSmax-(double)ucTPSoff);
+		if(usTPSraw>ucTPSmax)
+		{
+			usTPSraw=ucTPSmax;
+		}
+		ucTPS=((float)usTPSraw-(float)ucTPSoff)/((float)ucTPSmax-(float)ucTPSoff);
+		if(ucTPS>1)
+		{
+			ucTPS=1;
+		}
+
 		ucThrottle=ucPedalGain*ucTPS;
 
 		//	Rear Wheel Steering
@@ -393,15 +404,15 @@ void vUserTask(void const * argument)
 
 		if(usSAS==0)
 		{
-			ucRadius=1000000000;
+			ucRadius=1000000.0;
 		}
 		else
 		{
-			ucRadius=tan(usSAS*M_PI/180-M_PI/2)*ucWB;
+			ucRadius=tan((float)usSAS*3.14/180-3.14/2)*(float)ucWB;
 		}
 
 
-		if(fabs(ucRadius>ucWT/2))
+		if(fabs(ucRadius)>ucWT/2)
 		{
 			ucRin=ucRadius-ucWT/2;
 			ucRout=ucRadius+ucWT/2;
@@ -522,6 +533,10 @@ void vUserTask(void const * argument)
 			ctrlDrive_R=ucDriveMax;
 			ctrlDrive_L=ctrlDrive_L*(ucDriveMax/ctrlDrive_R);
 		}
+		else
+		{
+
+		}
 
 		vDacValueSet(0,ctrlDrive_L);
 		vDacValueSet(1,ctrlDrive_R);
@@ -561,10 +576,14 @@ void vUserTask(void const * argument)
 			vDacValueSet(4, usDacTestValue);
 			vDacValueSet(5, usDacTestValue);
 		}*/
-		printf("Throttle %% : %0.4f\n", ucTPS);
+		printf("Throttle %% : %.4f\n", ucTPS);
 		printf("Throttle raw: %d\n", usTPSraw);
-		printf("Left Throttle : %0.4f\n", ctrlDrive_L);
-		printf("Right Throttle : %0.4f", ctrlDrive_R);
+		printf("Throttle : %d\n", (int)ucThrottle);
+		printf("Left Throttle : %d\n", (int)ctrlDrive_L);
+		printf("Right Throttle : %d\n", (int)ctrlDrive_R);
+		printf("Radius: %d\n", (int)ucRadius);
+		printf("Rin: %d\n", (int)ucRin);
+		printf("Rout: %d\n", (int)ucRout);
 		printf("Gear Pos : %d\n", usSPOS);
 		printf("Left Wheel Dir : %d\n", ctrlDir_L);
 		printf("Right Wheel Dir : %d\n", ctrlDir_R);
@@ -1028,7 +1047,7 @@ void StartDefaultTask(void const * argument)
 	osThreadDef(EncoderTask, vEncoderAcqTask, osPriorityRealtime, 0, configMINIMAL_STACK_SIZE + 128);
 	osEncoderAcqTaskHandle = osThreadCreate(osThread(EncoderTask), NULL);
 
-	osThreadDef(UserTask, vUserTask, osPriorityRealtime, 0, 512);
+	osThreadDef(UserTask, vUserTask, osPriorityRealtime, 0, 3072);
 	osUserTaskHandle = osThreadCreate(osThread(UserTask), NULL);
 
 #if	(1 == _UseAdcAcqTask)
