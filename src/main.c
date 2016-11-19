@@ -266,6 +266,15 @@ void vUserTask(void const * argument)
 	float ucPedalGain;
 	float ucThrottle;					//	Throttle Pedal Gain
 	float ucCtrlerr;					// 	global variable for errors
+<<<<<<< HEAD
+
+
+
+	float ucDriveMax=10;				//	Drive Motor Command Limit
+	float ucSteerMax=5;					//	Steering Motor Command Limit
+
+
+=======
 
 
 
@@ -273,6 +282,7 @@ void vUserTask(void const * argument)
 	float ucSteerMax=5;					//	Steering Motor Command Limit
 
 
+>>>>>>> refs/remotes/origin/master
 	float ctrlSAS;						// Control input for steering angle motor(SAS)
 	float ctrlSWA;						// Control input for reaction torque(SWA)
 	float ctrlDrive_L;
@@ -341,8 +351,13 @@ void vUserTask(void const * argument)
 			usSPOS=0;
 		}
 																// -180 to 180
+<<<<<<< HEAD
+		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;				// Steering Wheel angle
+		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
+=======
 		usSWA=pusAbsoluteEncoder[0]*0.3515625-180.0;				// Steering Wheel angle
 		//usSAS=pusAbsoluteEncoder[1]*0.3515625-180.0;				// Rear steering angle
+>>>>>>> refs/remotes/origin/master
 
 		usTPSraw=pusAdcValue[0];
 		if(usTPSraw>ucTPSmax)
@@ -359,6 +374,15 @@ void vUserTask(void const * argument)
 
 		//	Rear Wheel Steering
 
+<<<<<<< HEAD
+		float ctrlerr;
+		ctrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
+		ctrlSAS=ucSteer_P*ctrlerr;								// Steering motor control input_PID control
+
+
+
+		if(_isKeyIn()==1)										// if KEY is ON, start motor
+=======
 
 		ucCtrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
 		ctrlSAS=ucSteer_P*ucCtrlerr;								// Steering motor control input_PID control
@@ -366,12 +390,17 @@ void vUserTask(void const * argument)
 
 
 		if(_IsKeyIn()==1)										// if KEY is ON, start motor
+>>>>>>> refs/remotes/origin/master
 		{
 														// RUN, START PIN - LOW (Originally open state)
 		}
 
 
+<<<<<<< HEAD
+		if(ctrlerr>0)											//Motor control direction setup
+=======
 		if(ucCtrlerr>0)											//Motor control direction setup
+>>>>>>> refs/remotes/origin/master
 		{
 														//GPIO_DIR pin=1
 		}
