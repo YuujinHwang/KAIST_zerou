@@ -49,7 +49,7 @@
 							</tool>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.998808563" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker">
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script.1304140541" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script" value="${workspace_loc:/${ProjName}/STM32F746ZGTx_FLASH.ld}" valueType="string"/>
-								<option id="gnu.c.link.option.ldflags.567150164" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-u _printf_float " valueType="string"/>
+								<option id="gnu.c.link.option.ldflags.567150164" name="Linker flags" superClass="gnu.c.link.option.ldflags" value="-specs=nano.specs -u _printf_float" valueType="string"/>
 								<option id="gnu.c.link.option.other.1505900027" name="Other options (-Xlinker [option])" superClass="gnu.c.link.option.other"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1012065513" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -192,5 +192,16 @@
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
-	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets"/>
+	<storageModule moduleId="org.eclipse.cdt.make.core.buildtargets">
+		<buildTargets>
+			<target name="KAIST_AUTO" path="Debug" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>KAIST_AUTO</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+		</buildTargets>
+	</storageModule>
 </cproject>
