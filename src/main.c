@@ -247,8 +247,8 @@ void vUserTask(void const * argument)
 	uint usTPSraw;
 	uint usIGN;
 
-	uint ucWT;
-	uint ucWB;
+	float ucWT;
+	float ucWB;
 	double ucRadius;
 	double ucRin;
 	double ucRout;
@@ -268,7 +268,6 @@ void vUserTask(void const * argument)
 	float ucCtrlerr;					// 	global variable for errors
 
 	float ucDriveMax=4000;				//	Drive Motor Command Limit
-	float ucSteerMax=5;					//	Steering Motor Command Limit
 
 	float ctrlSAS;						// Control input for steering angle motor(SAS)
 	float ctrlSWA;						// Control input for reaction torque(SWA)
@@ -287,7 +286,7 @@ void vUserTask(void const * argument)
 	ucTPSoff=0;
 	ucTPSmax=1024;
 
-	ucSteer_P=0;
+	ucSteer_P=30;
 //	ucSteer_D=0;
 //	ucSteer_I=0;
 //
@@ -338,10 +337,8 @@ void vUserTask(void const * argument)
 			usSPOS=0;
 		}
 																// -180 to 180
-		usSWA=pusAbsoluteEncoder[0]*0.3515625-180;				// Steering Wheel angle
 		usSAS=pusAbsoluteEncoder[1]*0.3515625-180;				// Rear steering angle
-		usSWA=pusAbsoluteEncoder[0]*0.3515625-180.0;				// Steering Wheel angle
-		//usSAS=pusAbsoluteEncoder[1]*0.3515625-180.0;				// Rear steering angle
+		usSWA=pusAbsoluteEncoder[0]*0.3515625-180.0;			// Steering Wheel angle
 
 
 		usTPSraw=pusAdcValue[0];
@@ -359,48 +356,51 @@ void vUserTask(void const * argument)
 
 		//	Rear Wheel Steering
 
-		ucCtrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
-		ctrlSAS=ucSteer_P*ucCtrlerr;								// Steering motor control input_PID control
+		usSWA=0;												// for DAC test
+		ucCtrlerr=usSWA*0.3333333-usSAS;						// Considering gear ratio of handle encoder
+		ctrlSAS=ucSteer_P*ucCtrlerr;							// Steering motor control input_PID control
 
 
-
-		if(_IsKeyIn()==1)										// if KEY is ON, start motor
-
-		ucCtrlerr=usSWA/3-usSAS;									// Considering gear ratio of handle encoder
-		ctrlSAS=ucSteer_P*ucCtrlerr;								// Steering motor control input_PID control
-
-
-
-		if(_IsKeyIn()==1)										// if KEY is ON, start motor
+		if(usIGN==1)											// if KEY is ON, start motor
 		{
-														// RUN, START PIN - LOW (Originally open state)
-		}
+			_SteerMotor0Run(0);									// RUN, START PIN - LOW (Originally open state)
+			_SteerMotor0Start(0);
+			_SteerMotor1Run(0);
+			_SteerMotor1Start(0);
 
-
-		if(ucCtrlerr>0)											//Motor control direction setup
-		{
-														//GPIO_DIR pin=1
 		}
 		else
 		{
-														//GPIO_DIR pin=0
+			_SteerMotor0Run(1);
+			_SteerMotor1Run(1);
 		}
 
 
-		if(ctrlSAS>10000)										// Control input saturation, max=10000
+
+		if(ctrlSAS>0)										//Motor direction setup
 		{
-			ctrlSAS=10000;
+			_SteerMotor0Dir(1);								//GPIO_DIR pin=1
 		}
 		else
 		{
-			if(ctrlSAS<-10000)
-			{
-				ctrlSAS=-10000;
-			}
+			_SteerMotor0Dir(0);								//GPIO_DIR pin=0
+		}
+
+		ctrlSWA=ctrlSAS;
+
+		if(ctrlSAS<0)									// Control input(0~4095) - absolute value, saturation
+		{
+			ctrlSAS=-ctrlSAS;
 		}
 
 
-		ctrlSAS=ctrlSAS/10000*5;								// Control input 0~10000  to 0V~5V mapping
+		if(ctrlSAS>4095)
+		{
+			ctrlSAS=4095;
+		}
+
+
+
 
 
 
@@ -553,7 +553,11 @@ void vUserTask(void const * argument)
 
 
 		//	Absolute Encoder Example
-		printf("A-Encoder - 0x%.4x, 0x%.4x\n", pusAbsoluteEncoder[0], pusAbsoluteEncoder[1]);
+		printf("A-Encoder - %d, %d\n", pusAbsoluteEncoder[0], pusAbsoluteEncoder[1]);
+		printf("angle, err, u, abs(u) - %d, %d, %d, %d\n", (int)usSAS, (int)ucCtrlerr, (int)ctrlSWA, (int)ctrlSAS);
+		printf(" err, Dir - %d, %d\n", (int)ucCtrlerr, _SteerMotor0Dir(1));
+
+
 
 		//	ADC Example
 		printf("ADC - %d, %d, %d\n", pusAdcValue[0], pusAdcValue[1], pusAdcValue[2]);
