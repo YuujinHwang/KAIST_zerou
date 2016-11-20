@@ -373,7 +373,10 @@ void vUserTask(void const * argument)
 		else
 		{
 			_SteerMotor0Run(1);
+			_SteerMotor0Start(1);
 			_SteerMotor1Run(1);
+			_SteerMotor1Start(1);
+
 		}
 
 
@@ -381,10 +384,14 @@ void vUserTask(void const * argument)
 		if(ctrlSAS>0)										//Motor direction setup
 		{
 			_SteerMotor0Dir(1);								//GPIO_DIR pin=1
+			_SteerMotor1Dir(1);								//GPIO_DIR pin=1
+
 		}
 		else
 		{
 			_SteerMotor0Dir(0);								//GPIO_DIR pin=0
+			_SteerMotor1Dir(0);								//GPIO_DIR pin=0
+
 		}
 
 		if(ctrlSAS<0)									// Control input(0~4095) - absolute value, saturation
