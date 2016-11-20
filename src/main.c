@@ -361,18 +361,22 @@ void vUserTask(void const * argument)
 		ctrlSAS=ucSteer_P*ucCtrlerr;							// Steering motor control input_PID control
 
 
-		if(usIGN==1)											// if KEY is ON, start motor
+		//if(usIGN==1)											// if KEY is ON, start motor
+		if(1)
 		{
-			_SteerMotor0Run(0);									// RUN, START PIN - LOW (Originally open state)
-			_SteerMotor0Start(0);
-			_SteerMotor1Run(0);
-			_SteerMotor1Start(0);
+			_SteerMotor0Run(1);									// RUN, START PIN - LOW (Originally open state)
+			_SteerMotor0Start(1);
+			_SteerMotor1Run(1);
+			_SteerMotor1Start(1);
 
 		}
 		else
 		{
-			_SteerMotor0Run(1);
-			_SteerMotor1Run(1);
+			_SteerMotor0Run(0);
+			_SteerMotor0Start(0);
+			_SteerMotor1Run(0);
+			_SteerMotor1Start(0);
+
 		}
 
 
@@ -380,13 +384,15 @@ void vUserTask(void const * argument)
 		if(ctrlSAS>0)										//Motor direction setup
 		{
 			_SteerMotor0Dir(1);								//GPIO_DIR pin=1
+			_SteerMotor1Dir(1);								//GPIO_DIR pin=1
+
 		}
 		else
 		{
 			_SteerMotor0Dir(0);								//GPIO_DIR pin=0
-		}
+			_SteerMotor1Dir(0);								//GPIO_DIR pin=0
 
-		ctrlSWA=ctrlSAS;
+		}
 
 		if(ctrlSAS<0)									// Control input(0~4095) - absolute value, saturation
 		{
@@ -398,6 +404,8 @@ void vUserTask(void const * argument)
 		{
 			ctrlSAS=4095;
 		}
+
+		ctrlSWA=ctrlSAS;
 
 
 
@@ -472,7 +480,7 @@ void vUserTask(void const * argument)
 				ctrlDrive_R=-ctrlDrive_R;
 			}
 		}
-		if(usSPOS==-1)
+		else if(usSPOS==-1)
 		{
 			if(ctrlDrive_L>0)
 			{
@@ -544,8 +552,15 @@ void vUserTask(void const * argument)
 
 		}
 
-		vDacValueSet(0,ctrlDrive_L);
-		vDacValueSet(1,ctrlDrive_R);
+
+
+
+
+
+		vDacValueSet(0,ctrlSAS);
+		vDacValueSet(1,ctrlSWA);
+		vDacValueSet(2,ctrlDrive_L);
+		vDacValueSet(3,ctrlDrive_R);
 
 
 
@@ -554,8 +569,8 @@ void vUserTask(void const * argument)
 
 		//	Absolute Encoder Example
 		printf("A-Encoder - %d, %d\n", pusAbsoluteEncoder[0], pusAbsoluteEncoder[1]);
-		printf("angle, err, u, abs(u) - %d, %d, %d, %d\n", (int)usSAS, (int)ucCtrlerr, (int)ctrlSWA, (int)ctrlSAS);
-		printf(" err, Dir - %d, %d\n", (int)ucCtrlerr, _SteerMotor0Dir(1));
+		printf("angle, err, u - %d, %d, %d\n", (int)usSAS, (int)ucCtrlerr, (int)ctrlSWA, (int)ctrlSAS);
+		printf(" err, Dir - %d\n", (int)ucCtrlerr);
 
 
 
