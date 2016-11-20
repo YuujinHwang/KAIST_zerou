@@ -364,18 +364,18 @@ void vUserTask(void const * argument)
 		//if(usIGN==1)											// if KEY is ON, start motor
 		if(1)
 		{
-			_SteerMotor0Run(0);									// RUN, START PIN - LOW (Originally open state)
-			_SteerMotor0Start(0);
-			_SteerMotor1Run(0);
-			_SteerMotor1Start(0);
+			_SteerMotor0Run(1);									// RUN, START PIN - LOW (Originally open state)
+			_SteerMotor0Start(1);
+			_SteerMotor1Run(1);
+			_SteerMotor1Start(1);
 
 		}
 		else
 		{
-			_SteerMotor0Run(1);
-			_SteerMotor0Start(1);
-			_SteerMotor1Run(1);
-			_SteerMotor1Start(1);
+			_SteerMotor0Run(0);
+			_SteerMotor0Start(0);
+			_SteerMotor1Run(0);
+			_SteerMotor1Start(0);
 
 		}
 
@@ -569,7 +569,7 @@ void vUserTask(void const * argument)
 
 		//	Absolute Encoder Example
 		printf("A-Encoder - %d, %d\n", pusAbsoluteEncoder[0], pusAbsoluteEncoder[1]);
-		printf("angle, err, u, abs(u) - %d, %d, %d, %d\n", (int)usSAS, (int)ucCtrlerr, (int)ctrlSWA, (int)ctrlSAS);
+		printf("angle, err, u - %d, %d, %d\n", (int)usSAS, (int)ucCtrlerr, (int)ctrlSWA, (int)ctrlSAS);
 		printf(" err, Dir - %d\n", (int)ucCtrlerr);
 
 
